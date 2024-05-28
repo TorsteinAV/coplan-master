@@ -13,11 +13,6 @@ const StyledBox = styled.div`
   width: 100%;
 `;
 
-const Line = styled.div`
-    margin: 0;
-    padding: 0;
-`;
-
 const FoodGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
