@@ -27,7 +27,7 @@ const FoodGrid = styled.div`
 `;
 
 const FoodCard = styled.div`
-  background-color: #fff;
+  background-color: ${props => (props.selected ? '#96bf9c' : 'white')};
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   text-align: center;
@@ -63,9 +63,10 @@ const ShoppingList = styled.div`
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: #4CAF50;
+  background-color: #96bf9c;
   color: white;
   border: none;
+  padding: black, 1px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
@@ -74,12 +75,11 @@ const Button = styled.button`
   }
 `;
 
-// Hovedkomponent for måltidsplanleggeren
 const MealPlanner = () => {
   const [foods, setFoods] = useState([]);
   const [selectedFoods, setSelectedFoods] = useState([]);
   const [days, setDays] = useState(2);
-  const [persons, setPersons] = useState(1); // Antall personer for måltidsplanen
+  const [persons, setPersons] = useState(1); 
   const [mealPlan, setMealPlan] = useState([]);
   const [shoppingList, setShoppingList] = useState({});
   const [confetti, setConfetti] = useState(false);
@@ -97,7 +97,6 @@ const MealPlanner = () => {
         fetchedFoods.push(food);
       });
       setFoods(fetchedFoods);
-      setSelectedFoods(fetchedFoods.map(food => food.id));
     } catch (error) {
       console.error("Error fetching food data:", error);
     }
@@ -118,13 +117,12 @@ const MealPlanner = () => {
     alert("Din måltidsplan er laget, bla ned for å se!");
   };
 
-  // Justerer ingredienser basert på antall personer
   const generateShoppingList = (selectedMeals) => {
     const list = {};
     selectedMeals.forEach(meal => {
       meal.ingredients.forEach(({ ingredient, amount, unit }) => {
         const key = `${ingredient} (${unit})`;
-        const numAmount = parseFloat(amount) * persons; // Ganger med antall personer
+        const numAmount = parseFloat(amount) * persons;
         if (!isNaN(numAmount)) {
           if (list[key]) {
             list[key] += numAmount;
@@ -141,9 +139,6 @@ const MealPlanner = () => {
     setShoppingList(formattedList);
   };
 
-  if (!foods.length) {
-    return <StyledBox>Loading...</StyledBox>;
-  }
   const removeAndReplaceMeal = (mealId) => {
     setMealPlan(prev => {
       const remainingMeals = prev.filter(meal => meal.id !== mealId);
@@ -151,8 +146,8 @@ const MealPlanner = () => {
       const newMeal = availableFoods[Math.floor(Math.random() * availableFoods.length)];
 
       if (newMeal) {
-        remainingMeals.push(newMeal); // Add the new meal
-        generateShoppingList(remainingMeals); // Recalculate the shopping list with the new meal
+        remainingMeals.push(newMeal);
+        generateShoppingList(remainingMeals);
       }
 
       return remainingMeals;
@@ -162,6 +157,7 @@ const MealPlanner = () => {
   if (!foods.length) {
     return <StyledBox>Loading...</StyledBox>;
   }
+
   return (
     <StyledBox>
       {confetti && <Confetti />}
@@ -179,41 +175,36 @@ const MealPlanner = () => {
           type="number"
           min="1"
           value={persons}
-          onChange={e => setPersons(Math.max(1, parseInt(e.target.value)))} // Sikrer at minimum 1 person er valgt
+          onChange={e => setPersons(Math.max(1, parseInt(e.target.value)))}
         />
         <Button onClick={generateMealPlan}>Generer måltidsplan</Button>
       </InputContainer>
       <FoodGrid>
         {foods.map(food => (
-          <FoodCard key={food.id} onClick={() => handleFoodSelection(food.id)}>
+          <FoodCard
+            key={food.id}
+            onClick={() => handleFoodSelection(food.id)}
+            selected={selectedFoods.includes(food.id)}  
+          >
             <img src={food.imageUrl} alt={food.name} />
             <h3>{food.name}</h3>
-            <input
-              type="checkbox"
-              ///endring fra hovedkoden checked til check
-              check={selectedFoods.includes(food.id)}
-              onChange={() => handleFoodSelection(food.id)}
-            />
           </FoodCard>
         ))}
       </FoodGrid>
+
       <h3>Din måltidsplan:</h3>
       {mealPlan.length > 0 && (
         <FoodGrid>
-          
-          
           {mealPlan.map(food => (
             <FoodCard key={food.id}>
               <img src={food.imageUrl} alt={food.name} />
               <h3>{food.name}</h3>
-              <line1><Button onClick={() => removeAndReplaceMeal(food.id)}>Bytt ut</Button></line1>
-              <>
+              <Button onClick={() => removeAndReplaceMeal(food.id)}>Bytt ut</Button>
               <p>
-              <Link to={`/${food.id}`}>
-                <Button>Les mer om {food.name}</Button>
-              </Link>
+                <Link to={`/${food.id}`}>
+                  <Button>Les mer om {food.name}</Button>
+                </Link>
               </p>
-              </>
             </FoodCard>
           ))}
         </FoodGrid>
