@@ -13,6 +13,11 @@ const StyledBox = styled.div`
   width: 100%;
 `;
 
+const Line = styled.div`
+    margin: 0;
+    padding: 0;
+`;
+
 const FoodGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -107,7 +112,7 @@ const MealPlanner = () => {
     setMealPlan(shuffled.slice(0, days));
     generateShoppingList(shuffled.slice(0, days));
     setConfetti(true);
-    setTimeout(() => setConfetti(false), 2000);
+    setTimeout(() => setConfetti(false), 5000);
 
     alert("Din måltidsplan er laget, bla ned for å se!");
   };
@@ -154,15 +159,14 @@ const MealPlanner = () => {
   }
 
   return (
-    <StyledBox>
-      {confetti && <Confetti />}
+    <StyledBox>  
       <InputContainer>
         <label htmlFor="days">Velg antall dager for måltidsplan:</label>
         <input
           id="days"
           type="number"
           value={days}
-          onChange={e => setDays(Math.max(2, Math.min(7, parseInt(e.target.value))))}
+          onChange={e => setDays(Math.max(1, Math.min(7, parseInt(e.target.value))))}
         />
         <label htmlFor="persons">Antall personer:</label>
         <input
@@ -174,12 +178,13 @@ const MealPlanner = () => {
         />
         <Button onClick={generateMealPlan}>Generer måltidsplan</Button>
       </InputContainer>
+      {confetti && <Confetti />}
       <FoodGrid>
         {foods.map(food => (
           <FoodCard
             key={food.id}
             onClick={() => handleFoodSelection(food.id)}
-            selected={selectedFoods.includes(food.id)}  
+            selected={selectedFoods.includes(food.id)}
           >
             <img src={food.imageUrl} alt={food.name} />
             <h3>{food.name}</h3>
@@ -195,6 +200,7 @@ const MealPlanner = () => {
               <img src={food.imageUrl} alt={food.name} />
               <h3>{food.name}</h3>
               <Button onClick={() => removeAndReplaceMeal(food.id)}>Bytt ut</Button>
+              <div color='white'>.</div>
               <p>
                 <Link to={`/${food.id}`}>
                   <Button>Les mer om {food.name}</Button>
